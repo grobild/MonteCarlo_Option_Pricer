@@ -1,64 +1,72 @@
-# MonteCarlo_Option_Pricer
-Monte Carlo implementation of European option pricer under GBM. Numerical validation and convergence analysis.
+# Monte Carlo Option Pricer
 
-1. Quant_Pricing_Engine : Valorisation d'Options par Monte Carlo (Python/NumPy)
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue) ![NumPy](https://img.shields.io/badge/NumPy-Vectorized-green) ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
-🎯 Motivation du Projet
+## ⚡ Overview
+A high-performance **Monte Carlo simulation engine** for pricing European Call options under **Geometric Brownian Motion (GBM)**. This project demonstrates stochastic modeling, vectorized numerical implementation in `NumPy`, and validation against the closed-form **Black-Scholes** solution.
 
-Ce dépôt est le premier pilier de mon portfolio Quant. Il démontre ma maîtrise de la modélisation stochastique et de l'implémentation de méthodes numériques performantes.
+### Key Features
+* **Vectorized Simulation:** Leverages `NumPy` broadcasting for parallel path generation, minimizing runtime.
+* **Analytical Benchmarking:** Validates numerical error convergence against Black-Scholes.
+* **Statistical Analysis:** Verifies the Log-Normal distribution of terminal asset prices.
 
-Le projet vise à valoriser une option Call Européenne en utilisant la méthode de Monte Carlo (simulation), en utilisant le modèle de Mouvement Brownien Géométrique (GBM) pour le sous-jacent.
+---
 
-Compétences Clés Démontrées
+## 📐 Mathematical Model
 
-Mathématiques (GMM) : Processus stochastiques, simulation de variables aléatoires (Box-Muller), Théorie de l'évaluation neutre au risque.
+### 1. Asset Dynamics (GBM)
+The asset price $S_t$ evolves under the risk-neutral measure $\mathbb{Q}$ according to the Stochastic Differential Equation:
 
-Technique : Utilisation de NumPy pour le calcul vectoriel et la rapidité d'exécution, bonne pratique de code Python.
+$$
+\mathrm{d}S_t = r S_t \mathrm{d}t + \sigma S_t \mathrm{d}W_t^{\mathbb{Q}}
+$$
 
-🔬 Modèle Mathématique
+Where:
+* $r$: Risk-free rate
+* $\sigma$: Volatility
+* $W_t$: Wiener process
 
-L'Équation (GBM)
+### 2. Numerical Solution
+Since European options are path-independent, we simulate the terminal price $S_T$ directly using the exact solution to the SDE:
 
-Sous la mesure neutre au risque, l'évolution du prix de l'actif ($S_t$) suit :
+$$
+S_T = S_0 \exp\left( \left(r - \frac{1}{2}\sigma^2\right)T + \sigma \sqrt{T} Z \right)
+$$
 
-$$\mathrm{d} S_{t} = r S_{t} \mathrm{d} t + \sigma S_{t} \mathrm{d} W_{t}
-$$### L'Implémentation Monte Carlo
+Where $Z \sim \mathcal{N}(0, 1)$ is a standard normal random variable.
 
-Pour des options Européennes, la simulation peut se faire directement à maturité ($T$). Le prix est donné par :
+### 3. Monte Carlo Estimator
+The option price is the discounted expectation of the payoff:
 
-$$\text{Prix} = e^{-rT} \mathbb{E}\left[\max(S\_T - K, 0)\right]
-$$L'implémentation dans `gbm_pricer.py` utilise la nature vectorielle de `NumPy` pour simuler $N$ prix finaux ($S_T$) en parallèle, ce qui est significativement plus rapide que les boucles itératives.
+$$
+V_0 \approx e^{-rT} \frac{1}{N} \sum_{i=1}^{N} \max(S_{T}^{(i)} - K, 0)
+$$
 
------
+---
 
-## 📊 Résultats et Analyse de la Convergence
+## 📊 Validation
+The implementation confirms the **Law of Large Numbers**, where the Monte Carlo estimator converges to the analytical Black-Scholes price at a rate of $\mathcal{O}(1/\sqrt{N})$.
 
-L'exécution du script compare le prix estimé par Monte Carlo avec la solution analytique exacte (Black-Scholes).
+![Convergence Plot](path/to/your/plot.png)
+*(Replace this text with your actual image path)*
 
-### 1\. Convergence
+---
 
-Ce graphique confirme la validité de l'approche Monte Carlo. Plus le nombre de simulations (N) augmente, plus le prix estimé (ligne verte) converge vers la valeur de référence de Black-Scholes (ligne orange pointillée), conformément à la **Loi des Grands Nombres**.
+## 🚀 Roadmap
+1. **C++ Implementation:** Rewrite the core engine in C++ for high-performance benchmarking ($N > 10^7$).
+2. **Exotic Derivatives:** Extend pricing to **Asian Options** (path-dependent arithmetic mean).
+3. **Greeks Calculation:** Implement Delta and Gamma sensitivity using pathwise differentiation.
 
-### 2\. Distribution Log-Normale
+---
 
-L'histogramme des prix de l'actif à maturité ($S_T$) montre la distribution log-normale des prix finaux, ce qui est la signature du modèle GBM. La majeure partie de la probabilité est concentrée à gauche du Strike, mais la longue queue vers la droite justifie la valeur de l'option (le potentiel de gain illimité).
+## ⚙️ Usage
 
------
+```bash
+# 1. Clone the repository
+git clone [https://github.com/yourusername/monte-carlo-pricer.git](https://github.com/yourusername/monte-carlo-pricer.git)
 
-## 🚀 Prochaines Étapes et Améliorations
+# 2. Install dependencies
+pip install numpy scipy matplotlib
 
-1.  **Transition C++ :** Réécrire le moteur de calcul de base en C++ pour créer un *benchmark* de performance et le comparer à la version Python/NumPy (objectif de performance pour les grands N).
-2.  **Options Exotiques :** Ajouter le pricing d'une option Asiatique (moyenne arithmétique des prix), pour laquelle la formule Black-Scholes n'existe pas, prouvant ainsi la nécessité de la simulation Monte Carlo.
-3.  **Calcul des Greeks :** Ajouter le calcul des sensibilités (Delta, Gamma) par différences finies ou par la méthode de la *Pathwise Differentiation*.
-
-## ⚙️ Comment Exécuter le Projet
-
-1.  **Cloner le dépôt :** `git clone https://www.wordreference.com/fren/d%C3%A9p%C3%B4t`
-2.  **Installer les dépendances :** Le projet nécessite Python, `numpy`, `scipy` et `matplotlib`.
-    ```bash
-    pip install numpy scipy matplotlib
-    ```
-3.  **Lancer la simulation :**
-    ```bash
-    python gbm_pricer.py
-    ```$$
+# 3. Run the pricer
+python gbm_pricer.py
