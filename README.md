@@ -69,4 +69,4 @@ git clone [https://github.com/grobild/montecarlo_option_pricer.git](https://gith
 pip install numpy scipy matplotlib
 
 # 3. Run the pricer
-python gbm_pricer.py
+python main.py
